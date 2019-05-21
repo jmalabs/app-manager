@@ -1,0 +1,47 @@
+<div class="container">
+
+
+  <form action="" fxLayout="row wrap" fxLayoutAlign="center start" class="artist-search-form">
+    <div fxFlex="row" fxFlexAlign="start" fxFlex="70">
+      <h1>Need Music?</h1>
+      <h4>Use Choogz Music app to browse your favorite songs!</h4>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="center start" fxFlex="100">
+      <mat-form-field appearance="legacy" fxFlex="70">
+        <mat-label>Artist Name</mat-label>
+        <input matInput placeholder="Search Artist..." (keyup)="searchArtist()" [(ngModel)]="searchParam"
+          name="searchInput">
+      </mat-form-field>
+    </div>
+    <!-- <div fxLayout="row" fxLayoutAlign="center start" fxFlex="100">
+        <button mat-raised-button color="primary">Primary</button>
+        <button mat-raised-button color="accent">Accent</button>
+        <button mat-raised-button color="warn">Warn</button>
+      </div> -->
+  </form>
+
+  <div *ngIf="artists" class="artist-results">
+    <mat-card *ngFor="let artist of artists" class="artist-result">
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <img [src]="artist.picture_small">
+        <span class="artist-name"><a>{{artist.name}}</a></span>
+      </div>
+      <div>
+        <mat-chip-list class="badge">
+          <mat-chip class="artist-badge" color="warn">No. of albums: {{artist.nb_album}}</mat-chip>
+          <mat-chip class="artist-badge" color="warn">No. of fans: {{artist.nb_fan}}</mat-chip>
+        </mat-chip-list>
+
+        <!-- <p class="artist-badge">
+          <mat-icon [matBadge]="artist.nb_album" matBadgeColor="warn" matTooltip="No. of albums: {{artist.nb_album}}">
+            album</mat-icon>
+        </p>
+        <p class="artist-badge">
+          <mat-icon [matBadge]="artist.nb_fan" matBadgeColor="warn" matTooltip="No. of fans: {{artist.nb_fan}}">people
+          </mat-icon>
+        </p> -->
+      </div>
+    </mat-card>
+  </div>
+</div>
