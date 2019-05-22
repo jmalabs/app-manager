@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Linq;
 using System.Threading.Tasks;
+using App.Manager.BLL.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,33 +14,31 @@ namespace App.Manager.WebUi.Controllers
     [ApiController]
     public class ServersController : ControllerBase
     {
-        private DirectoryEntry websiteEntry = null;
-        internal const string IIsWebServer = "IIsWebServer";
+        private readonly IServerBusiness _serverBusiness;
+
+        public ServersController(IServerBusiness serverBusiness)
+        {
+            _serverBusiness = serverBusiness;
+        }
 
         [HttpGet]
-        public List<string> GetServers()
+        public ActionResult<List<string>> GetServers()
         {
-
-            DirectoryEntry Services = new DirectoryEntry("IIS://localhost/W3SVC");
-            IEnumerator ie = Services.Children.GetEnumerator();
-            DirectoryEntry Server = null;
-            List<string> sites = new List<string>();
-
-            // find iis website
-            while (ie.MoveNext())
+            List<string> sites;
+            try
             {
-                Server = (DirectoryEntry)ie.Current;
-                if (Server.SchemaClassName == IIsWebServer)
+                sites = _serverBusiness.GetSites();
+
+                if(sites == null)
                 {
-                    //// "ServerComment" means name
-                    //if (Server.Properties["ServerComment"][0].ToString() == name)
-                    //{
-                    sites.Add(Server.Properties["ServerComment"][0].ToString());
-                    //}
+                    return NotFound();
                 }
             }
-
-            return sites;
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+            return Ok(sites);
         }
     }
 }

@@ -1,3 +1,5 @@
+using App.Manager.BLL;
+using App.Manager.BLL.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -21,6 +23,9 @@ namespace App.Manager.WebUi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddTransient<IServerBusiness, ServerBusiness>();
+            services.AddTransient<ISiteBusiness, SiteBusiness>();
+
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
