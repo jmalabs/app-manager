@@ -23,14 +23,34 @@ namespace App.Manager.WebUi.Controllers
 
 
         [HttpGet]
-        public ActionResult<List<string>> GetServers()
+        public ActionResult<List<SiteDTO>> GetSites()
         {
             List<SiteDTO> sites;
             try
             {
-                sites = _siteBusiness.GetSites();
+                sites = _siteBusiness.GetSites("localhost");
 
                 if (sites == null)
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+            return Ok(sites);
+        }
+
+        [HttpGet("application-pools")]
+        public ActionResult<List<string>> GetApplicationPools()
+        {
+            List<string> applicationPools;
+            try
+            {
+                applicationPools = _siteBusiness.GetApplicationPools("localhost");
+
+                if (applicationPools == null)
                 {
                     return NotFound();
                 }
@@ -39,7 +59,37 @@ namespace App.Manager.WebUi.Controllers
             {
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
-            return Ok(sites);
+            return Ok(applicationPools);
+        }
+
+        [HttpGet("{siteName}/stop")]
+        public ActionResult<bool> StopSite(string siteName)
+        {
+            try
+            {
+                _siteBusiness.StopSite(siteName);
+
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("{siteName}/start")]
+        public ActionResult<bool> StartSite(string siteName)
+        {
+            try
+            {
+                _siteBusiness.StartSite(siteName);
+
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }
