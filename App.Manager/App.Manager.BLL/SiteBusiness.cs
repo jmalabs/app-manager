@@ -13,31 +13,31 @@ namespace App.Manager.BLL
         private DirectoryEntry websiteEntry = null;
         internal const string IIsWebServer = "IIsWebServer";
 
-        public List<SiteDTO> GetSites(string domain = "localhost")
-        {
-            DirectoryEntry directoryEntry = null;
-            var directoryEntries = this.GetDirectoryEntry($"IIS://{domain}/W3SVC");
-            var enumerator = directoryEntries.Children.GetEnumerator();
-            var sites = new List<SiteDTO>();
+        //public List<SiteDTO> GetSites(string domain = "localhost")
+        //{
+        //    DirectoryEntry directoryEntry = null;
+        //    var directoryEntries = this.GetDirectoryEntry($"IIS://{domain}/W3SVC");
+        //    var enumerator = directoryEntries.Children.GetEnumerator();
+        //    var sites = new List<SiteDTO>();
 
-            while (enumerator.MoveNext())
-            {
-                directoryEntry = (DirectoryEntry)enumerator.Current;
-                if (directoryEntry.SchemaClassName == IIsWebServer)
-                {
-                    sites.Add(new SiteDTO()
-                    {
-                        Name = directoryEntry.Properties["ServerComment"][0].ToString(),
-                        Identity = Convert.ToInt32(directoryEntry.Name),
-                        PhysicalPath = GetPath(directoryEntry),
-                        ServerStatus = GetSiteStatus(directoryEntry)
+        //    while (enumerator.MoveNext())
+        //    {
+        //        directoryEntry = (DirectoryEntry)enumerator.Current;
+        //        if (directoryEntry.SchemaClassName == IIsWebServer)
+        //        {
+        //            sites.Add(new SiteDTO()
+        //            {
+        //                Name = directoryEntry.Properties["ServerComment"][0].ToString(),
+        //                Identity = Convert.ToInt32(directoryEntry.Name),
+        //                PhysicalPath = GetPath(directoryEntry),
+        //                ServerStatus = GetSiteStatus(directoryEntry)
 
-                    });
-                }
-            }
+        //            });
+        //        }
+        //    }
 
-            return sites;
-        }
+        //    return sites;
+        //}
 
         static string GetPath(DirectoryEntry server)
         {
@@ -95,19 +95,6 @@ namespace App.Manager.BLL
                 }
             }
             return applicationPools;
-            //DirectoryEntry root = this.GetDirectoryEntry("IIS://" + domain + "/W3SVC/AppPools");
-            //if (root == null)
-            //    return null;
-
-            //var applicationPools = new List<string>();
-
-            //foreach (DirectoryEntry Entry in root.Children)
-            //{
-            //    PropertyCollection Properties = Entry.Properties;
-            //    applicationPools.Add(Entry.Name);
-            //}
-
-            //return applicationPools;
         }
 
 
@@ -118,7 +105,7 @@ namespace App.Manager.BLL
             ServerManager manager = new ServerManager();
             foreach (Site site in manager.Sites)
             {
-                if(site.Name == siteName)
+                if (site.Name == siteName)
                 {
                     site.Stop();
                 }
@@ -139,6 +126,44 @@ namespace App.Manager.BLL
                 }
             }
             return true;
+        }
+
+        public List<SiteDTO> GetSites(string domain = "localhost")
+        {
+            var sites = new List<SiteDTO>();
+            var manager = new ServerManager();
+            foreach (var site in manager.Sites)
+            {
+                var webSite = new SiteDTO()
+                {
+                    Name = site.Name,
+                    Identity = Convert.ToInt32(site.Id),
+                    PhysicalPath = site.Applications["/"].VirtualDirectories["/"].PhysicalPath,
+                    ServerStatus = ServerStatus.GetStatus((int)site.State),
+                    AppPoolName = site.Applications["/"].ApplicationPoolName
+                };
+
+                foreach (var app in site.Applications)
+                {
+                    if(app.Path == "/")
+                    {
+                        continue;
+                    }
+
+                    var appSite = new ApplicationSiteDTO()
+                    {
+                        AppPoolName = app.ApplicationPoolName,
+                        Name = app.Path,
+                        PhysicalPath = app.VirtualDirectories["/"].PhysicalPath,
+                    };
+
+                    webSite.Applications.Add(appSite);
+                }
+
+                sites.Add(webSite);
+            }
+
+            return sites;
         }
     }
 }

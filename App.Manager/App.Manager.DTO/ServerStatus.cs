@@ -22,43 +22,43 @@
 
         public static readonly ServerStatus Starting = new ServerStatus()
         {
-            Code = 1,
+            Code = 0,
             Status = "Starting"
         };
 
         public static readonly ServerStatus Started = new ServerStatus()
         {
-            Code = 2,
+            Code = 1,
             Status = "Started"
         };
 
         public static readonly ServerStatus Stopping = new ServerStatus()
         {
-            Code = 3,
+            Code = 2,
             Status = "Stopping"
         };
 
         public static readonly ServerStatus Stopped = new ServerStatus()
         {
-            Code = 4,
+            Code = 3,
             Status = "Stopped"
         };
 
         public static readonly ServerStatus Pausing = new ServerStatus()
         {
-            Code = 5,
+            Code = 4,
             Status = "Pausing"
         };
 
         public static readonly ServerStatus Paused = new ServerStatus()
         {
-            Code = 6,
+            Code = 5,
             Status = "Paused  "
         };
 
         public static readonly ServerStatus Continuing = new ServerStatus()
         {
-            Code = 7,
+            Code = 6,
             Status = "Continuing"
         };
 
